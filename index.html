@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MathJax Test</title>
+
+  <!-- MathJax configuration -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['\$', '\$']],
+        displayMath: [['\\[', '\\]']]
+      }
+    };
+  </script>
+
+  <!-- MathJax library -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+
+<body>
+
+<h2>Problem 1</h2>
+
+<p>
+The roots of the quadratic equation
+\[
+x^2 - 5x + 6 = 0
+\]
+are \ldots
+</p>
+<p><strong>Time left:</strong> <span id="timer">300</span> seconds</p>
+<script>
+let time = 300;
+
+const countdown = setInterval(() => {
+  time--;
+  document.getElementById("timer").innerText = time;
+
+  if (time <= 0) {
+    clearInterval(countdown);
+    checkQuiz();
+    alert("Time is up!");
+  }
+}, 1000);
+</script>
+<form id="quiz">
+
+<h3>Problem 1</h3>
+<p>
+Solve
+\[
+x^2 - 5x + 6 = 0
+\]
+</p>
+<label><input type="radio" name="q1" value="A"> \(1,6\)</label><br>
+<label><input type="radio" name="q1" value="B"> \(2,3\)</label><br>
+<label><input type="radio" name="q1" value="C"> \(-2,-3\)</label>
+
+<hr>
+
+<h3>Problem 2</h3>
+<p>
+Compute
+\[
+\int_0^1 x\,dx
+\]
+</p>
+<label><input type="radio" name="q2" value="A"> \(1\)</label><br>
+<label><input type="radio" name="q2" value="B"> \(\frac12\)</label><br>
+<label><input type="radio" name="q2" value="C"> \(\frac13\)</label>
+
+<br><br>
+<button type="button" onclick="checkQuiz()">Submit</button>
+
+<p id="score"></p>
+</form>
+
+
+<script>
+function checkQuiz() {
+  const answers = {
+    q1: "B",
+    q2: "B"
+  };
+
+  let score = 0;
+  let total = Object.keys(answers).length;
+
+  for (let q in answers) {
+    const selected = document.querySelector(`input[name="${q}"]:checked`);
+    if (selected && selected.value === answers[q]) {
+      score++;
+    }
+  }
+
+  document.getElementById("score").innerHTML =
+    `Score: ${score} / ${total}`;
+}
+</script>
+</body>
+</html>
