@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>MathJax Test</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- MathJax configuration -->
   <script>
     MathJax = {
@@ -16,19 +16,61 @@
 
   <!-- MathJax library -->
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  max-width: 800px;
+  margin: auto;
+  padding: 15px;
+}
+
+h1, h2 {
+  text-align: center;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+}
+
+@media (max-width: 600px) {
+  body {
+    font-size: 16px;
+  }
+}
+</style>
 </head>
 
 <body>
+    <div id="loginBox">
+  <h2>Login Peserta</h2>
 
-<h2>Problem 1</h2>
+  <label>
+    Nama:
+    <input type="text" id="loginName">
+  </label><br><br>
 
-<p>
-The roots of the quadratic equation
-\[
-x^2 - 5x + 6 = 0
-\]
-are \ldots
-</p>
+  <label>
+    Kelas:
+    <input type="text" id="loginClass">
+  </label><br><br>
+
+  <label>
+    Token Ujian:
+    <input type="text" id="loginToken">
+  </label><br><br>
+
+  <button onclick="login()">Masuk Ujian</button>
+  <hr>
+</div>
+<h1>Zero Tutorial Matematika</h1>
+<p style="text-align:center;">Online Math Assessment</p>
+<hr>
+<label>
+Name:
+<input type="text" id="name" required>
+</label>
+<hr>
 <p><strong>Time left:</strong> <span id="timer">300</span> seconds</p>
 <script>
 let time = 300;
@@ -44,6 +86,15 @@ const countdown = setInterval(() => {
   }
 }, 1000);
 </script>
+
+<label>
+Exam Token:
+<input type="text" id="token">
+</label>
+<hr>
+<div id="examBox" style="display:none;">
+  <!-- SELURUH FORM UJIAN DI SINI -->
+
 <form id="quiz">
 
 <h3>Problem 1</h3>
@@ -53,9 +104,9 @@ Solve
 x^2 - 5x + 6 = 0
 \]
 </p>
-<label><input type="radio" name="q1" value="A"> \(1,6\)</label><br>
-<label><input type="radio" name="q1" value="B"> \(2,3\)</label><br>
-<label><input type="radio" name="q1" value="C"> \(-2,-3\)</label>
+<label><input type="radio" name="q1" value="A"> $((1,6)$</label><br>
+<label><input type="radio" name="q1" value="B"> $(2,3)$</label><br>
+<label><input type="radio" name="q1" value="C"> $(-2,-3)$</label>
 
 <hr>
 
@@ -71,14 +122,25 @@ Compute
 <label><input type="radio" name="q2" value="C"> \(\frac13\)</label>
 
 <br><br>
-<button type="button" onclick="checkQuiz()">Submit</button>
+<button id="submitBtn" type="button" onclick="checkQuiz()">Submit</button>
 
 <p id="score"></p>
 </form>
-
+</div>
 
 <script>
 function checkQuiz() {
+    const validToken = "TPB2026";
+const userToken = document.getElementById("token").value;
+
+if (userToken !== validToken) {
+  alert("Invalid token!");
+  return;
+}
+    if (localStorage.getItem("submitted") === "yes") {
+  alert("You have already submitted!");
+  return;
+}
   const answers = {
     q1: "B",
     q2: "B"
@@ -86,17 +148,66 @@ function checkQuiz() {
 
   let score = 0;
   let total = Object.keys(answers).length;
+  let resultData = {};
 
   for (let q in answers) {
     const selected = document.querySelector(`input[name="${q}"]:checked`);
+    resultData[q] = selected ? selected.value : "";
     if (selected && selected.value === answers[q]) {
       score++;
     }
   }
 
+  resultData.score = score;
+  resultData.name = document.getElementById("name").value;
+resultData.name = localStorage.getItem("name");
+resultData.kelas = localStorage.getItem("kelas");
+  // 🔴 GANTI URL INI
+  fetch("https://script.google.com/macros/s/AKfycbyzkST29kJPtxW_zZcosf9H38s6fdoSqx0seBUsZTzrwFdYK8dhAe6xnl-1wlNRH0CaLg/exec", {
+    method: "POST",
+    body: JSON.stringify(resultData)
+  });
+localStorage.setItem("submitted", "yes");
+document.getElementById("submitBtn").disabled = true;
   document.getElementById("score").innerHTML =
     `Score: ${score} / ${total}`;
 }
+</script>
+<script>
+function login() {
+  const name = document.getElementById("loginName").value.trim();
+  const kelas = document.getElementById("loginClass").value.trim();
+  const token = document.getElementById("loginToken").value.trim();
+
+  const validToken = "TPB2026"; // ganti sesuai ujian
+
+  if (!name || !kelas || !token) {
+    alert("Lengkapi semua data!");
+    return;
+  }
+
+  if (token !== validToken) {
+    alert("Token salah!");
+    return;
+  }
+
+  // simpan data login
+  localStorage.setItem("name", name);
+  localStorage.setItem("kelas", kelas);
+  localStorage.setItem("loggedIn", "yes");
+
+  // tampilkan ujian
+  document.getElementById("loginBox").style.display = "none";
+  document.getElementById("examBox").style.display = "block";
+}
+</script>
+<script>
+window.onload = function () {
+  if (localStorage.getItem("loggedIn") === "yes") {
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("examBox").style.display = "block";
+  }
+};
 </script>
 </body>
 </html>
